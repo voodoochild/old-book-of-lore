@@ -16,7 +16,7 @@ export const cycles = createTable(
   "cycle",
   {
     id: serial("id").primaryKey(),
-    code: varchar("code", { length: 16 }).unique(),
+    code: varchar("code", { length: 16 }).notNull().unique(),
     name: varchar("name", { length: 64 }).notNull().unique(),
     position: integer("position").notNull().unique(),
   }
@@ -26,7 +26,7 @@ export const releases = createTable(
   "release",
   {
     id: serial("id").primaryKey(),
-    code: varchar("code", { length: 16 }).primaryKey(),
+    code: varchar("code", { length: 16 }).notNull().unique(),
     name: varchar("name", { length: 64 }).notNull().unique(),
     cycleId: integer("cycleId").notNull().references(() => cycles.id),
     position: integer("position").notNull(),
@@ -40,7 +40,7 @@ export const cards = createTable(
   "card",
   {
     id: serial("id").primaryKey(),
-    code: char("code", { length: 5 }).unique(),
+    code: char("code", { length: 5 }).notNull().unique(),
     name: varchar("name", { length: 128 }).notNull(),
     subtitle: varchar("name", { length: 64 }),
     cycleId: integer("cycleId").notNull().references(() => cycles.id),
