@@ -8,7 +8,7 @@
 
 ## TODO
 
-- [ ] Make it deploy
+- [x] Make it deploy
 - [ ] Initial pass at data structure
 - [ ] Scaffold basic UI with mock data
 - [ ] Set up a database

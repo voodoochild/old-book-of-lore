@@ -1,34 +1,77 @@
-// Example model schema from the Drizzle docs
-// https://orm.drizzle.team/docs/sql-schema-declaration
-
-import { sql } from "drizzle-orm";
 import {
+  char,
   index,
+  integer,
   pgTableCreator,
+  primaryKey,
   serial,
-  timestamp,
+  unique,
   varchar,
 } from "drizzle-orm/pg-core";
+import { CardTrait, CardType } from "../types";
 
-/**
- * This is an example of how to use the multi-project schema feature of Drizzle ORM. Use the same
- * database instance for multiple projects.
- *
- * @see https://orm.drizzle.team/docs/goodies#multi-project-schema
- */
-export const createTable = pgTableCreator((name) => `old-book-of-lore_${name}`);
+export const createTable = pgTableCreator((name) => `obol_${name}`);
 
-export const posts = createTable(
-  "post",
+export const cycles = createTable(
+  "cycle",
   {
     id: serial("id").primaryKey(),
-    name: varchar("name", { length: 256 }),
-    createdAt: timestamp("created_at", { withTimezone: true })
-      .default(sql`CURRENT_TIMESTAMP`)
-      .notNull(),
-    updatedAt: timestamp("updatedAt", { withTimezone: true }),
+    code: varchar("code", { length: 16 }).unique(),
+    name: varchar("name", { length: 64 }).notNull().unique(),
+    position: integer("position").notNull().unique(),
+  }
+);
+
+export const releases = createTable(
+  "release",
+  {
+    id: serial("id").primaryKey(),
+    code: varchar("code", { length: 16 }).primaryKey(),
+    name: varchar("name", { length: 64 }).notNull().unique(),
+    cycleId: integer("cycleId").notNull().references(() => cycles.id),
+    position: integer("position").notNull(),
   },
-  (example) => ({
-    nameIndex: index("name_idx").on(example.name),
+  (t) => ({
+    unq: unique().on(t.cycleId, t.position),
+  })
+);
+
+export const cards = createTable(
+  "card",
+  {
+    id: serial("id").primaryKey(),
+    code: char("code", { length: 5 }).unique(),
+    name: varchar("name", { length: 128 }).notNull(),
+    subtitle: varchar("name", { length: 64 }),
+    cycleId: integer("cycleId").notNull().references(() => cycles.id),
+    releaseId: integer("releaseId").notNull().references(() => releases.id),
+    position: integer("position").notNull(),
+    type: varchar("type", { length: 16 }).$type<CardType>().notNull(),
+  },
+  (t) => ({
+    unq: unique().on(t.releaseId, t.position),
+    nameIndex: index().on(t.name),
+  })
+);
+
+export const traits = createTable(
+  "trait",
+  {
+    id: serial("id").primaryKey(),
+    name: varchar("name", { length: 32 }).$type<CardTrait>().notNull().unique(),
+  },
+  (t) => ({
+    nameIndex: index().on(t.name),
+  })
+);
+
+export const cardsToTraits = createTable(
+  "cards_to_traits",
+  {
+    cardId: integer("cardId").notNull().references(() => cards.id),
+    traitId: integer("traitId").notNull().references(() => traits.id),
+  },
+  (t) => ({
+    pk: primaryKey({ columns: [t.cardId, t.traitId] }),
   })
 );
