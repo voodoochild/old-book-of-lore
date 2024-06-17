@@ -40,6 +40,7 @@ export const factions = createTable(
   {
     code: varchar("code", { length: 16 }).primaryKey(),
     name: varchar("name", { length: 256 }).notNull().unique(),
+    is_primary: boolean("is_primary").notNull(),
   }
 );
 

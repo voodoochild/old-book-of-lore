@@ -8,5 +8,5 @@ export default {
   dbCredentials: {
     url: env.POSTGRES_URL,
   },
-  tablesFilter: ["old-book-of-lore_*"],
+  tablesFilter: ["obol_*"],
 } satisfies Config;
