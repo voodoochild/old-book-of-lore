@@ -1,6 +1,7 @@
 import "dotenv/config";
 import { db } from "..";
 import { factions } from "../schema";
+
 import factionsJSON from "../../../../data/factions.json";
 
 async function importFactions() {

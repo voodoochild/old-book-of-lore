@@ -3,6 +3,7 @@ import {
   char,
   integer,
   pgTableCreator,
+  unique,
   varchar,
 } from "drizzle-orm/pg-core";
 
@@ -22,9 +23,12 @@ export const packs = createTable(
   {
     code: varchar("code", { length: 16 }).primaryKey(),
     name: varchar("name", { length: 256 }).notNull().unique(),
-    position: integer("position").notNull().unique(),
+    position: integer("position").notNull(),
     cycle_code: varchar("cycle_code", { length: 16 }).notNull().references(() => cycles.code),
-  }
+  },
+  (t) => ({
+    unq: unique().on(t.cycle_code, t.position),
+  })
 );
 
 export const types = createTable(
@@ -78,7 +82,10 @@ export const cards = createTable(
     back_flavor: varchar("back_flavor", { length: 256 }),
     imagesrc: varchar("imagesrc", { length: 256 }),
     backimagesrc: varchar("backimagesrc", { length: 256 }),
-  }
+  },
+  (t) => ({
+    unq: unique().on(t.pack_code, t.position),
+  })
 );
 
 export const cardTraits = createTable(
